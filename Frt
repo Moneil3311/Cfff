@@ -1,0 +1,43 @@
+import React, { useState } from 'react';
+import axios from 'axios'; // for making HTTP requests
+
+const App = () => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+
+  const handleChange = (e) => {
+    setQuery(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.get(`https://api.cognitive.microsoft.com/bing/v7.0/search?q=${query}`, {
+        headers: {
+          'Ocp-Apim-Subscription-Key': 'YOUR_API_KEY_HERE',
+        },
+      });
+      setResults(response.data.webPages.value);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input type="text" value={query} onChange={handleChange} />
+        <button type="submit">Search</button>
+      </form>
+      <ul>
+        {results.map((result) => (
+          <li key={result.id}>
+            <a href={result.url}>{result.name}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default App;
